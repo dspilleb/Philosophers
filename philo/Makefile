@@ -1,10 +1,10 @@
 NAME = philo
 
-SRC_C = main.c
+SRC_C = main.c inits.c
 SRC_DIR = 
 SRC = $(addprefix $(SRC_DIR), $(SRC_C))
 
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror -lpthread
 INCLUDE = #-fsanitize=address -g
 
 OBJ_DIR = ./objects/

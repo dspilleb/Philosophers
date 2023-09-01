@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/01 10:59:34 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/01 12:45:28 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,14 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <pthread.h>
+# include <string.h>
 
 typedef struct data
 {
 	pthread_mutex_t	*forks;
+	int				*last_meal;
 	int				philo_count;
-	int				state;
+	pthread_mutex_t	state;
 	int				current;
 	int				time_to_sleep;
 	int				time_to_eat;
@@ -42,7 +44,7 @@ int	get_time(void);
 pthread_mutex_t	*init_forks(int nb);
 pthread_t	*init_philosopher(int nb, t_data data);
 void	free_matrix(void **matrix, int size);
-void	init_data(int ac, char **av, t_data *data);
+int	init_data(int ac, char **av, t_data *data);
 void	*routine(t_data *arg);
 
 #endif

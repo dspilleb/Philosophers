@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/01 11:03:10 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/01 18:28:40 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,11 @@ pthread_t	*init_philosopher(int nb, t_data data)
 	return (philos);
 }
 
-void	init_data(int ac, char **av, t_data *data)
+int	init_data(int ac, char **av, t_data *data)
 {
 	data->current = 1;
-	data->state = 1;
+	if (pthread_mutex_init(&data->state, NULL))
+		return (EXIT_FAILURE);
 	data->philo_count = atoi(av[1]); //todo take my atoi
 	data->time_to_die = atoi(av[2]);
 	data->time_to_eat = atoi(av[3]);
@@ -65,4 +66,9 @@ void	init_data(int ac, char **av, t_data *data)
 		data->must_eat = atoi(av[5]);
 	else
 		data->must_eat = -1;
+	data->last_meal = malloc (sizeof(int) * data->philo_count);
+	if (!data->current)
+		return (EXIT_FAILURE);
+	memset(data->last_meal, 0, data->philo_count);
+	return (EXIT_SUCCESS);
 }

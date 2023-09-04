@@ -6,13 +6,22 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:23 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 13:55:43 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 19:02:09 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	get_time(void)
+void	my_sleep(useconds_t time)
+{
+	unsigned int start;
+
+	start = get_time();
+	while (get_time() < (start + time))
+		usleep(1);
+}
+
+unsigned int	get_time(void)
 {
 	struct timeval			time;
 	static struct timeval	initial_time;
@@ -41,12 +50,12 @@ void	check_philos(t_data	*data)
 	while (data->state)
 	{
 		i = -1;
-		while (++i < data->philo_count)
+		while (data->state && ++i < data->philo_count)
 		{
 			if (is_dead(i + 1, data) && data->philos[i].state == ALIVE)
 			{
-				data->state = 0;
 				printf(R "%d %d died\n", get_time(), i + 1);
+				data->state = 0;
 				pthread_exit(EXIT_SUCCESS);
 			}
 		}
@@ -71,58 +80,91 @@ void	destroy_forks(t_data *data)
 	i = -1;
 	while (++i < data->philo_count)
 	{
-		if (data->forks[i].lock)
-			pthread_mutex_unlock(&data->forks[i].fork);
 		pthread_mutex_destroy(&data->forks[i].fork);
 	}
 	free(data->forks);
 }
 
-void	eating(int nb, t_data *data)
+void	unlock_forks_exit(void *fork1, void *fork2)
 {
-	pthread_mutex_lock(&data->forks[nb - 1].fork);
-	data->forks[nb - 1].lock = 1;
-	if (!data->state)
-		pthread_exit(EXIT_SUCCESS);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
-	if (data->philo_count == 1)
-		pthread_exit(EXIT_SUCCESS);
-	pthread_mutex_lock(&data->forks[(nb) % data->philo_count].fork);
-	data->forks[(nb) % data->philo_count].lock = 1;
-	if (!data->state)
-		pthread_exit(EXIT_SUCCESS);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
-	if (!data->state)
-		pthread_exit(EXIT_SUCCESS);
-	printf(B "%d %d is eating\n", get_time(), nb);
-	data->last_meal[nb - 1] = get_time();
-	usleep(data->time_to_eat * 1000);
-	pthread_mutex_unlock(&data->forks[nb - 1].fork);
-	data->forks[nb - 1].lock = 0;
-	pthread_mutex_unlock(&data->forks[(nb) % data->philo_count].fork);
-	data->forks[(nb) % data->philo_count].lock = 0;
+	if (fork1)
+		pthread_mutex_unlock(fork1);
+	if (fork2)
+		pthread_mutex_unlock(fork2);
+	pthread_exit(EXIT_SUCCESS);
 }
 
-void	*routine(t_data *arg)
+void	eating_odd(int nb, t_data *data)
+{
+	pthread_mutex_lock(&data->forks[nb - 1].fork);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[nb - 1].fork, NULL);
+	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	if (data->philo_count == 1)
+	{
+		printf(R "%d %d died\n", get_time(), nb);
+		unlock_forks_exit(&data->forks[nb - 1].fork, NULL);
+	}
+	pthread_mutex_lock(&data->forks[(nb) % data->philo_count].fork);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
+	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
+	data->last_meal[nb - 1] = get_time();
+	printf(B "%d %d is eating\n", get_time(), nb);
+	my_sleep(data->time_to_eat);
+	pthread_mutex_unlock(&data->forks[nb - 1].fork);
+	pthread_mutex_unlock(&data->forks[(nb) % data->philo_count].fork);
+}
+
+void eating_even(int nb, t_data *data)
+{
+	pthread_mutex_lock(&data->forks[(nb) % data->philo_count].fork);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[(nb) % data->philo_count].fork, NULL);
+	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	if (data->philo_count == 1)
+	{
+		printf(R "%d %d died\n", get_time(), nb);
+		unlock_forks_exit(&data->forks[(nb) % data->philo_count].fork, NULL);
+	}
+	pthread_mutex_lock(&data->forks[nb - 1].fork);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[(nb) % \
+		data->philo_count].fork, &data->forks[nb - 1].fork);
+	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[(nb) % \
+		data->philo_count].fork, &data->forks[nb - 1].fork);
+	data->last_meal[nb - 1] = get_time();
+	printf(B "%d %d is eating\n", get_time(), nb);
+	my_sleep(data->time_to_eat);
+	pthread_mutex_unlock(&data->forks[(nb) % data->philo_count].fork);
+	pthread_mutex_unlock(&data->forks[nb - 1].fork);
+}
+
+void	*routine(t_philo *philo)
 {
 	int	count;
-	int	my_id;
 
-	my_id = arg->current;
 	count = 0;
-	while (arg->state && (count < arg->must_eat || arg->must_eat == -1))
+	while (philo->data->state && (count < philo->data->must_eat || philo->data->must_eat == -1))
 	{
-		eating(my_id, arg);
-		if (!arg->state)
+		if (philo->number % 2 == 0)
+			eating_even(philo->number, philo->data);
+		else
+			eating_odd(philo->number, philo->data);
+		if (!philo->data->state)
 			break ;
-		printf(Y "%d %d  is sleeping\n", get_time(), my_id);
-		usleep(arg->time_to_sleep * 1000);
-		if (!arg->state)
+		printf(Y "%d %d  is sleeping\n", get_time(), philo->number);
+		my_sleep(philo->data->time_to_sleep);
+		if (!philo->data->state)
 			break ;
-		printf(G "%d %d is thinking\n", get_time(), my_id);
+		printf(G "%d %d is thinking\n", get_time(), philo->number);
 		count++;
 	}
-	arg->philos[my_id - 1].state = FINISHED;
+	philo->state = FINISHED;
 	pthread_exit(EXIT_SUCCESS);
 }
 

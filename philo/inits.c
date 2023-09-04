@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 13:56:38 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 18:33:17 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,10 @@ void	 init_philosopher(int nb, t_data *data)
 	while (++i < nb)
 	{
 		data->philos[i].state = ALIVE;
-		if (pthread_create(&data->philos[i].philo, NULL, (void *)routine, data))
+		data->philos[i].number = i + 1;
+		data->philos[i].data = data;
+		if (pthread_create(&data->philos[i].philo, NULL, (void *)routine, (void *) &data->philos[i]))
 			return (free_matrix((void **)data->philos, i));
-		usleep(10);
-		data->current++;
 	}
 	i = -1;
 	while (++i < nb)
@@ -61,6 +61,9 @@ void	 init_philosopher(int nb, t_data *data)
 
 int	init_data(int ac, char **av, t_data *data)
 {
+	int i;
+
+	i = -1;
 	data->current = 1;
 	if (pthread_mutex_init(&data->lock, NULL))
 		return (EXIT_FAILURE);
@@ -74,8 +77,9 @@ int	init_data(int ac, char **av, t_data *data)
 	else
 		data->must_eat = -1;
 	data->last_meal = malloc (sizeof(int) * data->philo_count);
-	if (!data->current)
+	if (!data->last_meal)
 		return (EXIT_FAILURE);
-	memset(data->last_meal, 0, data->philo_count);
+	while (++i < data->philo_count)
+		data->last_meal[i] = 0;
 	return (EXIT_SUCCESS);
 }

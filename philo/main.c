@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:23 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/04 19:02:09 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 20:31:57 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ unsigned int	get_time(void)
 		initial_time.tv_sec = time.tv_sec;
 		initial_time.tv_usec = time.tv_usec;
 	}
-	return ((time.tv_sec * 1000 + time.tv_usec / 1000) - 
-		(initial_time.tv_sec * 1000 + initial_time.tv_usec / 1000));
+	return (((time.tv_sec * 1000) + (time.tv_usec / 1000)) - 
+		((initial_time.tv_sec * 1000) + (initial_time.tv_usec / 1000)));
 }
 
 int	is_dead(int nb, t_data *data)
@@ -54,7 +54,7 @@ void	check_philos(t_data	*data)
 		{
 			if (is_dead(i + 1, data) && data->philos[i].state == ALIVE)
 			{
-				printf(R "%d %d died\n", get_time(), i + 1);
+				printf(R "%d %d died\n" C, get_time(), i + 1);
 				data->state = 0;
 				pthread_exit(EXIT_SUCCESS);
 			}
@@ -79,9 +79,7 @@ void	destroy_forks(t_data *data)
 
 	i = -1;
 	while (++i < data->philo_count)
-	{
 		pthread_mutex_destroy(&data->forks[i].fork);
-	}
 	free(data->forks);
 }
 
@@ -99,20 +97,20 @@ void	eating_odd(int nb, t_data *data)
 	pthread_mutex_lock(&data->forks[nb - 1].fork);
 	if (!data->state)
 		unlock_forks_exit(&data->forks[nb - 1].fork, NULL);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	printf(M "%d %d has taken a fork\n" C, get_time(), nb);
 	if (data->philo_count == 1)
 	{
-		printf(R "%d %d died\n", get_time(), nb);
+		printf(R "%d %d died\n" C, get_time(), nb);
 		unlock_forks_exit(&data->forks[nb - 1].fork, NULL);
 	}
 	pthread_mutex_lock(&data->forks[(nb) % data->philo_count].fork);
-	if (!data->state)
-		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
-	if (!data->state)
-		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
 	data->last_meal[nb - 1] = get_time();
-	printf(B "%d %d is eating\n", get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
+	printf(M "%d %d has taken a fork\n" C, get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[nb - 1].fork, &data->forks[(nb) % data->philo_count].fork);
+	printf(B "%d %d is eating\n" C, get_time(), nb);
 	my_sleep(data->time_to_eat);
 	pthread_mutex_unlock(&data->forks[nb - 1].fork);
 	pthread_mutex_unlock(&data->forks[(nb) % data->philo_count].fork);
@@ -123,22 +121,22 @@ void eating_even(int nb, t_data *data)
 	pthread_mutex_lock(&data->forks[(nb) % data->philo_count].fork);
 	if (!data->state)
 		unlock_forks_exit(&data->forks[(nb) % data->philo_count].fork, NULL);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
+	printf(M "%d %d has taken a fork\n" C, get_time(), nb);
 	if (data->philo_count == 1)
 	{
-		printf(R "%d %d died\n", get_time(), nb);
+		printf(R "%d %d died\n" C, get_time(), nb);
 		unlock_forks_exit(&data->forks[(nb) % data->philo_count].fork, NULL);
 	}
 	pthread_mutex_lock(&data->forks[nb - 1].fork);
-	if (!data->state)
-		unlock_forks_exit(&data->forks[(nb) % \
-		data->philo_count].fork, &data->forks[nb - 1].fork);
-	printf(R "%d %d has taken a fork\n", get_time(), nb);
-	if (!data->state)
-		unlock_forks_exit(&data->forks[(nb) % \
-		data->philo_count].fork, &data->forks[nb - 1].fork);
 	data->last_meal[nb - 1] = get_time();
-	printf(B "%d %d is eating\n", get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[(nb) % \
+		data->philo_count].fork, &data->forks[nb - 1].fork);
+	printf(M "%d %d has taken a fork\n" C, get_time(), nb);
+	if (!data->state)
+		unlock_forks_exit(&data->forks[(nb) % \
+		data->philo_count].fork, &data->forks[nb - 1].fork);
+	printf(B "%d %d is eating\n" C, get_time(), nb);
 	my_sleep(data->time_to_eat);
 	pthread_mutex_unlock(&data->forks[(nb) % data->philo_count].fork);
 	pthread_mutex_unlock(&data->forks[nb - 1].fork);
@@ -149,7 +147,7 @@ void	*routine(t_philo *philo)
 	int	count;
 
 	count = 0;
-	while (philo->data->state && (count < philo->data->must_eat || philo->data->must_eat == -1))
+	while (philo->data->state && (philo->data->must_eat == -1 || count < philo->data->must_eat))
 	{
 		if (philo->number % 2 == 0)
 			eating_even(philo->number, philo->data);
@@ -157,11 +155,11 @@ void	*routine(t_philo *philo)
 			eating_odd(philo->number, philo->data);
 		if (!philo->data->state)
 			break ;
-		printf(Y "%d %d  is sleeping\n", get_time(), philo->number);
+		printf(Y "%d %d is sleeping\n" C, get_time(), philo->number);
 		my_sleep(philo->data->time_to_sleep);
 		if (!philo->data->state)
 			break ;
-		printf(G "%d %d is thinking\n", get_time(), philo->number);
+		printf(G "%d %d is thinking\n" C, get_time(), philo->number);
 		count++;
 	}
 	philo->state = FINISHED;
@@ -178,10 +176,10 @@ int	main(int ac, char **av)
 			return (EXIT_FAILURE);
 		data.forks = init_forks(atoi(av[1]));
 		if (!data.forks)
-			return(printf("ERROR MALLOC"), 0);
+			return(printf("ERROR MALLOC" C), 0);
 		init_philosopher(atoi(av[1]), &data); //check malloc fail
 		destroy_forks(&data);
 	}
 	else
-		printf("gros argumente\n");
+		printf(R "Mauvais nombre d'arguments\n" C);
 }

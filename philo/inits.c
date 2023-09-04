@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/03 21:51:11 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 13:56:38 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,20 +40,22 @@ void	 init_philosopher(int nb, t_data *data)
 	if (nb <= 0)
 		return ;
 	i = -1;
-	data->philos = malloc(sizeof(pthread_t *) * nb);
+	data->philos = malloc(sizeof(t_philo) * nb);
 	if (!data->philos)
 		return ;
 	pthread_create(&monitoring, NULL, (void *)check_philos, data);
 	while (++i < nb)
 	{
-		if (pthread_create(&data->philos[i], NULL, (void *)routine, data))
+		data->philos[i].state = ALIVE;
+		if (pthread_create(&data->philos[i].philo, NULL, (void *)routine, data))
 			return (free_matrix((void **)data->philos, i));
 		usleep(10);
 		data->current++;
 	}
 	i = -1;
 	while (++i < nb)
-		pthread_join(data->philos[i], NULL);
+		pthread_join(data->philos[i].philo, NULL);
+	data->state = 0;
 	pthread_join(monitoring, NULL);
 }
 

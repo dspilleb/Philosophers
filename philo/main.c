@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:23 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/03 22:14:59 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 13:55:43 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	get_time(void)
 int	is_dead(int nb, t_data *data)
 {
 	if ((get_time() - data->last_meal[nb - 1]) > data->time_to_die)
-		return (printf(R "%d %d died\n", get_time(), nb), 1);
+		return (1);
 	return (0);
 }
 
@@ -38,18 +38,20 @@ void	check_philos(t_data	*data)
 {
 	int	i;
 
-	while (1)
+	while (data->state)
 	{
 		i = -1;
 		while (++i < data->philo_count)
 		{
-			if (is_dead(i + 1, data)) // proteger avec le state du philo, fini ou pas ?
+			if (is_dead(i + 1, data) && data->philos[i].state == ALIVE)
 			{
 				data->state = 0;
+				printf(R "%d %d died\n", get_time(), i + 1);
 				pthread_exit(EXIT_SUCCESS);
 			}
 		}
 	}
+	pthread_exit(EXIT_SUCCESS);
 }
 
 void	free_matrix(void **matrix, int size)
@@ -75,6 +77,7 @@ void	destroy_forks(t_data *data)
 	}
 	free(data->forks);
 }
+
 void	eating(int nb, t_data *data)
 {
 	pthread_mutex_lock(&data->forks[nb - 1].fork);
@@ -111,14 +114,15 @@ void	*routine(t_data *arg)
 	{
 		eating(my_id, arg);
 		if (!arg->state)
-			break;
+			break ;
 		printf(Y "%d %d  is sleeping\n", get_time(), my_id);
 		usleep(arg->time_to_sleep * 1000);
 		if (!arg->state)
-			break;
+			break ;
 		printf(G "%d %d is thinking\n", get_time(), my_id);
 		count++;
 	}
+	arg->philos[my_id - 1].state = FINISHED;
 	pthread_exit(EXIT_SUCCESS);
 }
 

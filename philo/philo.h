@@ -6,12 +6,15 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/03 21:51:18 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/04 13:46:33 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
+
+# define ALIVE 1
+# define FINISHED 0
 
 # define R "\x1b[1;31m"
 # define G "\x1b[1;32m"
@@ -33,9 +36,15 @@ typedef struct fork_mutex
 	int				lock;
 }	t_fork;
 
+typedef struct philosopher
+{
+	pthread_t		philo;
+	int				state;
+}	t_philo;
+
 typedef struct data
 {
-	pthread_t		*philos;
+	t_philo			*philos;
 	t_fork			*forks;
 	int				*last_meal;
 	int				philo_count;
@@ -48,11 +57,11 @@ typedef struct data
 	int				must_eat;
 }	t_data;
 
-int	get_time(void);
+int		get_time(void);
 t_fork	*init_forks(int nb);
-void	 init_philosopher(int nb, t_data *data);
+void	init_philosopher(int nb, t_data *data);
 void	free_matrix(void **matrix, int size);
-int	init_data(int ac, char **av, t_data *data);
+int		init_data(int ac, char **av, t_data *data);
 void	*routine(t_data *arg);
 void	check_philos(t_data	*data);
 

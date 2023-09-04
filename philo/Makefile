@@ -1,11 +1,11 @@
 NAME = philo
 
-SRC_C = main.c
+SRC_C = main.c inits.c
 SRC_DIR = 
 SRC = $(addprefix $(SRC_DIR), $(SRC_C))
 
-FLAGS = -Wall -Wextra -Werror
-INCLUDE = #-fsanitize=address -g
+FLAGS = -Wall -Wextra -Werror -lpthread
+INCLUDE = #-fsanitize=thread -g
 
 OBJ_DIR = ./objects/
 OBJ = $(addprefix $(OBJ_DIR), $(SRC_C:.c=.o))
@@ -26,7 +26,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	gcc $(FLAGS) -c $< -o $@
 
 clean:
-	echo $(BLUE)"- Cleaning Push_Swap -"$(NONE)
+	echo $(BLUE)"- Cleaning philo -"$(NONE)
 	rm -rf $(OBJ_DIR)
 
 fclean: clean

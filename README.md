@@ -24,7 +24,7 @@
 It was originally formulated in 1965 by Edsger Dijkstra as a student exam exercise, presented in terms of computers competing for access to tape drive peripherals.
 Soon after, Tony Hoare gave the problem its present form.
 
-<a href=‘https://en.wikipedia.org/wiki/Dining_philosophers_problem#/media/File:An_illustration_of_the_dining_philosophers_problem.png’ align="center"><img src=‘https://user-images.githubusercontent.com/59456000/198906008-4135d5d2-de53-4a8b-9c24-744181f04851.png’ width=‘275’ heigth=‘275’></img></a>
+<a href=‘https://en.wikipedia.org/wiki/Dining_philosophers_problem#/media/File:An_illustration_of_the_dining_philosophers_problem.png’><img src=‘https://user-images.githubusercontent.com/59456000/198906008-4135d5d2-de53-4a8b-9c24-744181f04851.png’ width=‘275’ heigth=‘275’></img></a>
 <p align=“center”>Illustration of the dining philosophers problem</p>
 <br><br>
 

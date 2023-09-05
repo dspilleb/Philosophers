@@ -40,7 +40,7 @@ make all
 ```bash
 ./philo number_philosopher time_to_die time_to_eat time_to_sleep [number_of_time_each_philosophers_must_eat]
 ```
-
+<br>
 <li>number_of_philosophers: The number of philosophers and also the number
 of forks.</li>
 <li>time_to_die (in milliseconds): If a philosopher didn’t start eating time_to_die

@@ -51,6 +51,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 .vscode/
-
+LazyPhilosophersTester
+Philosphers-42Project-Tester
 TODO
-philo

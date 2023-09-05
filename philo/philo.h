@@ -6,12 +6,15 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/03 21:51:18 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/05 11:33:28 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
+
+# define ALIVE 1
+# define FINISHED 0
 
 # define R "\x1b[1;31m"
 # define G "\x1b[1;32m"
@@ -26,34 +29,53 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <string.h>
+# include <errno.h>
 
 typedef struct fork_mutex
 {
 	pthread_mutex_t	fork;
-	int				lock;
 }	t_fork;
+
+typedef struct philosopher
+{
+	pthread_t		philo;
+	int				pstate;
+	int				number;
+	struct data		*data;
+}	t_philo;
 
 typedef struct data
 {
-	pthread_t		*philos;
-	t_fork			*forks;
-	int				*last_meal;
+	t_philo			*philos;
+	pthread_mutex_t	*forks;
+	unsigned int	*last_meal;
 	int				philo_count;
 	int				state;
-	pthread_mutex_t	lock;
-	int				current;
-	int				time_to_sleep;
-	int				time_to_eat;
-	int				time_to_die;
+	unsigned int	time_to_sleep;
+	unsigned int	time_to_eat;
+	unsigned int	time_to_die;
 	int				must_eat;
 }	t_data;
 
-int	get_time(void);
-t_fork	*init_forks(int nb);
-void	 init_philosopher(int nb, t_data *data);
-void	free_matrix(void **matrix, int size);
-int	init_data(int ac, char **av, t_data *data);
-void	*routine(t_data *arg);
-void	check_philos(t_data	*data);
+void			check_philos(t_data	*data);
+void			unlock_forks_exit(void *fork1, void *fork2);
+
+//inits.c
+int				init_forks(t_data *data);
+int				init_philosophers(t_data *data);
+int				init_data(int ac, char **av, t_data *data);
+
+//routine.c
+void			*routine(t_philo *philo);
+
+//utils.c
+void			free_matrix(void **matrix, int size);
+unsigned int	get_time(void);
+int				is_dead(int nb, t_data *data);
+void			my_sleep(unsigned int time);
+
+//parsing.c
+int				ft_atoi(const char *nptr);
+int				is_unsigned_int(char **av);
 
 #endif

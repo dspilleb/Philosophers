@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 10:11:12 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/05 13:20:45 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/05 13:55:30 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	my_sleep(unsigned int time)
 
 	start = get_time();
 	while (get_time() < (start + time))
-		usleep(1);
+		usleep(500);
 }
 
 unsigned int	get_time(void)

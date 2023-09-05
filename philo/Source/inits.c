@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/05 13:20:43 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/05 13:59:45 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,13 +86,14 @@ int	init_data(int ac, char **av, t_data *data)
 	if (is_unsigned_int(av))
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
 	data->philo_count = ft_atoi(av[1]);
-	if (data->philo_count == 0)
-		return (printf(R "You need atleast 1 philosopher\n" C), 1);
 	data->time_to_die = ft_atoi(av[2]);
 	data->time_to_eat = ft_atoi(av[3]);
 	data->time_to_sleep = ft_atoi(av[4]);
 	if (ac == 6)
 		data->must_eat = ft_atoi(av[5]);
+	if (data->philo_count == 0 || data->time_to_die == 0 || \
+	data->time_to_eat == 0 || data->time_to_sleep == 0 || data->must_eat == 0)
+		return (printf(R "All values must be above 0\n" C), 1);
 	if (errno)
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
 	data->last_meal = malloc (sizeof(int) * data->philo_count);

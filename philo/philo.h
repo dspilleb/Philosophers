@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/05 11:33:28 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/07 19:05:56 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ typedef struct data
 {
 	t_philo			*philos;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t   talk;
 	unsigned int	*last_meal;
 	int				philo_count;
 	int				state;
@@ -58,7 +59,7 @@ typedef struct data
 }	t_data;
 
 void			check_philos(t_data	*data);
-void			unlock_forks_exit(void *fork1, void *fork2);
+void			unlock_mutex_exit(void *talk, void *fork1, void *fork2);
 
 //inits.c
 int				init_forks(t_data *data);

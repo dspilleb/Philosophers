@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:23 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/05 13:20:55 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/07 19:05:49 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,10 @@ void	check_philos(t_data	*data)
 		{
 			if (is_dead(i + 1, data) && data->philos[i].pstate == ALIVE)
 			{
+				pthread_mutex_lock(&data->talk);
 				printf(R "%d %d died\n" C, get_time(), i + 1);
 				data->state = 0;
+				pthread_mutex_unlock(&data->talk);
 				pthread_exit(EXIT_SUCCESS);
 			}
 		}
@@ -39,11 +41,14 @@ void	destroy_forks(t_data *data)
 	i = -1;
 	while (++i < data->philo_count)
 		pthread_mutex_destroy(&data->forks[i]);
+	pthread_mutex_destroy(&data->talk);
 	free(data->forks);
 }
 
-void	unlock_forks_exit(void *fork1, void *fork2)
+void	unlock_mutex_exit(void *talk, void *fork1, void *fork2)
 {
+	if (talk)
+		pthread_mutex_unlock(talk);
 	if (fork1)
 		pthread_mutex_unlock(fork1);
 	if (fork2)

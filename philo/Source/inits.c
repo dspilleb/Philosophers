@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/05 13:59:45 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/07 18:45:06 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	init_forks(t_data *data)
 			while (--i >= 0)
 				pthread_mutex_destroy(&data->forks[i]);
 			free(data->forks);
-			return (1);
+			return (printf(R "Error Mutex\n" C), 1);
 		}
 	}
 	return (0);
@@ -83,6 +83,8 @@ int	init_data(int ac, char **av, t_data *data)
 	errno = 0;
 	data->state = 1;
 	data->must_eat = -1;
+	if (pthread_mutex_init(&data->talk, NULL))
+		return (printf(R "Error Mutex\n" C), 1);
 	if (is_unsigned_int(av))
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
 	data->philo_count = ft_atoi(av[1]);

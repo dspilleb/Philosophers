@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/07 18:45:06 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/08 19:31:45 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ int	init_forks(t_data *data)
 		if (pthread_mutex_init(&data->forks[i], NULL))
 		{
 			while (--i >= 0)
+			{
 				pthread_mutex_destroy(&data->forks[i]);
+			}
 			free(data->forks);
 			return (printf(R "Error Mutex\n" C), 1);
 		}
@@ -40,15 +42,19 @@ int	create_threads(int nb, t_data *data)
 	i = -1;
 	while (++i < nb)
 	{
+		if (!data->state)
+			return (i);
 		if (pthread_create(&data->philos[i].philo, \
 		NULL, (void *)routine, (void *) &data->philos[i]))
 		{
+			pthread_mutex_lock(&data->talk);
 			data->state = 0;
 			printf(R "Failure to create philosophers\n" C);
+			pthread_mutex_unlock(&data->talk);
 			return (i);
 		}
 	}
-	return (nb);
+	return (i);
 }
 
 int	init_philosophers(t_data *data)
@@ -83,8 +89,6 @@ int	init_data(int ac, char **av, t_data *data)
 	errno = 0;
 	data->state = 1;
 	data->must_eat = -1;
-	if (pthread_mutex_init(&data->talk, NULL))
-		return (printf(R "Error Mutex\n" C), 1);
 	if (is_unsigned_int(av))
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
 	data->philo_count = ft_atoi(av[1]);
@@ -96,8 +100,12 @@ int	init_data(int ac, char **av, t_data *data)
 	if (data->philo_count == 0 || data->time_to_die == 0 || \
 	data->time_to_eat == 0 || data->time_to_sleep == 0 || data->must_eat == 0)
 		return (printf(R "All values must be above 0\n" C), 1);
+	if (data->philo_count > 500)
+		return (printf(R "The number of philosophers must be under 500\n" C), 1);
 	if (errno)
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
+	if (pthread_mutex_init(&data->talk, NULL))
+		return (printf(R "Error Mutex\n" C), 1);
 	data->last_meal = malloc (sizeof(int) * data->philo_count);
 	if (!data->last_meal)
 		return (printf(R "Malloc error\n" C), 1);

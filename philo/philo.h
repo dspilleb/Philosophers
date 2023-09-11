@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/07 19:05:56 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/09/11 12:10:38 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct data
 {
 	t_philo			*philos;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t   talk;
+	pthread_mutex_t	talk;
 	unsigned int	*last_meal;
 	int				philo_count;
 	int				state;

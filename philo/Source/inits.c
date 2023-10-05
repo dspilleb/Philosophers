@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/01 10:53:49 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/08 19:31:45 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/10/05 16:11:11 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,12 @@ int	init_forks(t_data *data)
 	int				i;
 
 	i = -1;
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->philo_count);
-	if (!data->forks)
-		return (printf(R "Error Malloc\n" C), 1);
 	while (++i < data->philo_count)
 	{
 		if (pthread_mutex_init(&data->forks[i], NULL))
 		{
 			while (--i >= 0)
-			{
 				pthread_mutex_destroy(&data->forks[i]);
-			}
-			free(data->forks);
 			return (printf(R "Error Mutex\n" C), 1);
 		}
 	}
@@ -64,9 +58,6 @@ int	init_philosophers(t_data *data)
 	pthread_t	monitoring;
 
 	i = -1;
-	data->philos = malloc(sizeof(t_philo) * data->philo_count);
-	if (!data->philos)
-		return (1);
 	while (++i < data->philo_count)
 	{
 		data->philos[i].pstate = ALIVE;
@@ -106,9 +97,6 @@ int	init_data(int ac, char **av, t_data *data)
 		return (printf(R "Arguments aren't positive integers\n" C), 1);
 	if (pthread_mutex_init(&data->talk, NULL))
 		return (printf(R "Error Mutex\n" C), 1);
-	data->last_meal = malloc (sizeof(int) * data->philo_count);
-	if (!data->last_meal)
-		return (printf(R "Malloc error\n" C), 1);
 	memset(data->last_meal, 0, (data->philo_count * sizeof(int)));
 	return (EXIT_SUCCESS);
 }

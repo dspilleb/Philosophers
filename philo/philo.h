@@ -6,7 +6,7 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:42:19 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/11 12:10:38 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/10/05 16:21:46 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,30 +31,27 @@
 # include <string.h>
 # include <errno.h>
 
-typedef struct fork_mutex
-{
-	pthread_mutex_t	fork;
-}	t_fork;
-
 typedef struct philosopher
 {
 	pthread_t		philo;
 	int				pstate;
 	int				number;
 	struct data		*data;
+	pthread_mutex_t	*l_f;
+	pthread_mutex_t	*r_f;
 }	t_philo;
 
 typedef struct data
 {
-	t_philo			*philos;
-	pthread_mutex_t	*forks;
+	t_philo			philos[500];
+	pthread_mutex_t	forks[500];
 	pthread_mutex_t	talk;
-	unsigned int	*last_meal;
+	int				last_meal[500];
 	int				philo_count;
 	int				state;
-	unsigned int	time_to_sleep;
-	unsigned int	time_to_eat;
-	unsigned int	time_to_die;
+	int				time_to_sleep;
+	int				time_to_eat;
+	int				time_to_die;
 	int				must_eat;
 }	t_data;
 
@@ -70,10 +67,9 @@ int				init_data(int ac, char **av, t_data *data);
 void			*routine(t_philo *philo);
 
 //utils.c
-void			free_matrix(void **matrix, int size);
-unsigned int	get_time(void);
+int				get_time(void);
 int				is_dead(int nb, t_data *data);
-void			my_sleep(unsigned int time);
+void			my_sleep(int time);
 
 //parsing.c
 int				ft_atoi(const char *nptr);

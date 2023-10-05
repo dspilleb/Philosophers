@@ -6,32 +6,22 @@
 /*   By: dspilleb <dspilleb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/05 10:11:12 by dspilleb          #+#    #+#             */
-/*   Updated: 2023/09/08 19:23:48 by dspilleb         ###   ########.fr       */
+/*   Updated: 2023/10/05 16:20:56 by dspilleb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void	free_matrix(void **matrix, int size)
+void	my_sleep(int time)
 {
-	int	i;
-
-	i = -1;
-	while (++i < size)
-		free(matrix[i]);
-	free(matrix);
-}
-
-void	my_sleep(unsigned int time)
-{
-	unsigned int	start;
+	int	start;
 
 	start = get_time();
 	while (get_time() < (start + time))
-		usleep(10);
+		usleep(500);
 }
 
-unsigned int	get_time(void)
+int	get_time(void)
 {
 	struct timeval			time;
 	static struct timeval	initial_time;
@@ -48,7 +38,7 @@ unsigned int	get_time(void)
 
 int	is_dead(int nb, t_data *data)
 {
-	if ((get_time() - data->last_meal[nb - 1]) > data->time_to_die)
+	if ((get_time() - data->last_meal[nb]) > data->time_to_die)
 		return (1);
 	return (0);
 }

@@ -4,7 +4,7 @@ SRC_C = main.c inits.c actions.c parsing.c utils.c
 SRC_DIR = Source/
 SRC = $(addprefix $(SRC_DIR), $(SRC_C))
 
-FLAGS = -Wall -Wextra -Werror -pthread
+FLAGS = -Wall -Wextra -Werror -pthread -g
 INCLUDE = #-fsanitize=thread -g 
 
 OBJ_DIR = ./objects/
